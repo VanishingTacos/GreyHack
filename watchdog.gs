@@ -14,36 +14,48 @@ if not config_file then
 	get_shell.launch(program_path)
 end if
 config_content = comp.File(home_dir+"/.WatchDogcfg/WatchDog.cfg").get_content
+folders = []
+for f in root_folder.get_folders
+	folders = folders.push(f.path)
+end for
+
+for ff in folders
+	temp = comp.File(ff).get_folders
+	if(temp != []) then
+		for ft in temp
+			folders = folders.push(ft.path)
+		end for
+	else
+		continue
+	end if
+end for
 
 /////////// First Initialisation /////////// 
 if config_content.len == 0 then
 	user_input("<b>Please press enter to start WatchDog file indexing...</b>\nThis will store all file paths and their sizes to ~/.WatchDogcfg/WatchDog.cfg.")
-	for file in root_folder.get_files
-		print(file.path + " " + size(file))
-		config_file.set_content(config_file.get_content + "\n" + file.path + " " + size(file))
-	end for
-	for folder_root in root_folder.get_folders
-		for file in folder_root.get_files
+	for fold in folders
+		for file in comp.File(fold).get_files
 			print(file.path + " " + size(file))
 			config_file.set_content(config_file.get_content + "\n" + file.path + " " + size(file))
 		end for
-		for folder in folder_root.get_folders
-			for file in folder.get_files
-				print(file.path + " " + size(file))
-				config_file.set_content(config_file.get_content + "\n" + file.path + " " + size(file))
-			end for
-		end for
 	end for
 end if
+print("Continuing in 3 seconds...")
+wait(3.0)
 clear_screen
-print("  _    _       _       _    ______            ")
-print("| |  | |     | |     | |   |  _  \           ")
-print("| |  | | __ _| |_ ___| |__ | | | |___   __ _ ")
-print("| |/\| |/ _` | __/ __| '_ \| | | / _ \ / _` |")
-print("\  /\  / (_| | || (__| | | | |/ / (_) | (_| |")
-print(" \/  \/ \__,_|\__\___|_| |_|___/ \___/ \__, |")
-print("                                        __/ |")
-print("                                       |___/ ")
+watchDogWelcomeTxt = "<color=green>"
+watchDogWelcomeTxt = watchDogWelcomeTxt + "  _    _       _       _    ______            "
+watchDogWelcomeTxt = watchDogWelcomeTxt + "| |  | |     | |     | |   |  _  \           "
+watchDogWelcomeTxt = watchDogWelcomeTxt + "| |  | | __ _| |_ ___| |__ | | | |___   __ _ "
+watchDogWelcomeTxt = watchDogWelcomeTxt + "| |/\| |/ _` | __/ __| '_ \| | | / _ \ / _` |"
+watchDogWelcomeTxt = watchDogWelcomeTxt + "\  /\  / (_| | || (__| | | | |/ / (_) | (_| |"
+watchDogWelcomeTxt = watchDogWelcomeTxt + " \/  \/ \__,_|\__\___|_| |_|___/ \___/ \__, |"
+watchDogWelcomeTxt = watchDogWelcomeTxt + "                                        __/ |"
+watchDogWelcomeTxt = watchDogWelcomeTxt + "                                       |___/ "
+watchDogWelcomeTxt = watchDogWelcomeTxt + "</color>"
+
+
+print(watchDogWelcomeTxt)
 user_input("Prss enter to start...")
 clear_screen
 
@@ -73,7 +85,7 @@ while true
 	end for
 	if procs_names != procs_names_init then
 		if procs_names.len > procs_names_init.len then
-			print("<b><color=white>[+] "+procs_names[procs_names.len-1]+"</color></b>")
+			print("<b><color=green>[+] "+procs_names[procs_names.len-1]+"</color></b>")
 		else if procs_names.len < procs_names_init.len then
 			get_procs_map = {}
 			get_procs_init_map = {}
@@ -121,20 +133,29 @@ while true
 			print("<b><color=red>[+] New file was detected: " + file.path + "</color></b>")
 		end if
 	end for
-	for folder_root in root_folder.get_folders
-		for file in folder_root.get_files
+	
+	folders = []
+	for f in root_folder.get_folders
+		folders = folders.push(f.path)
+	end for
+	
+	for ff in folders
+		temp = comp.File(ff).get_folders
+		if(temp != []) then
+			for ft in temp
+				folders = folders.push(ft.path)
+			end for
+		else
+			continue
+		end if
+	end for
+	
+	for fold in folders
+		for file in comp.File(fold).get_files
 			if config_file.get_content.indexOf(file.path + " " + size(file)) == null then
 				config_file.set_content(config_file.get_content + "\n" + file.path + " " + size(file))
 				print("<b><color=red>[+] New file was detected: " + file.path + "</color></b>")
 			end if
-		end for
-		for folder in folder_root.get_folders
-			for file in folder.get_files
-				if config_file.get_content.indexOf(file.path + " " + size(file)) == null then
-					config_file.set_content(config_file.get_content + "\n" + file.path + " " + size(file))
-					print("<b><color=red>[+] New file was detected: " + file.path + "</color></b>")
-				end if
-			end for
 		end for
 	end for
 end while
