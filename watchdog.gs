@@ -1,3 +1,9 @@
+// WatchDog is a tool that was will monitor processes that are opend and closed, will detect new files on the system, will detect when files are removed, will detect when files are changed.
+
+// Whats broken:
+// * Does not find all files on the system (WatchDog does not go deep enough to find everything)
+// * Does not properly remove a file from the config file when a file is deleted causing the script to crash
+
 comp = get_shell.host_computer
 root_folder = comp.File("/")
 get_config = comp.File(home_dir+"/.WatchDogcfg")
